@@ -84,13 +84,18 @@ const Footer: React.FC = () => {
             <img
               src={logoFooter}
               alt="Buzzara Logo"
-              className="h-24 md:h-32 mt-6 md:mt-0 md:ml-4"
-              style={{ width: "auto" }}
+              className="
+                w-full max-w-[120px]      /* ocupa até 120px de largura em mobile */
+                md:max-w-[160px]         /* até 160px em md+ */
+                h-auto                   /* mantém proporção original */
+                mt-6 md:mt-0 md:ml-4      /* espaçamento igual ao anterior */
+                object-contain           /* garante que a imagem não estique */
+              "
             />
           </div>
         </div>
 
-        <div className="border-t border-[#d4d2d2]mt-8 pt-6 text-center">
+        <div className="border-t border-[#d4d2d2] mt-8 pt-6 text-center">
           <p className="text-gray-500 text-sm">
             © {new Date().getFullYear()} Buzzara. Todos os direitos reservados.
           </p>

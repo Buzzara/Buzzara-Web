@@ -20,7 +20,7 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col bg-buzzara-background">
       <Header />
-      <Navigation onCategoryChange={handleCategoryChange} activeCategory={activeCategory} />
+      <Navigation onCategoryChange={handleCategoryChange} activeCategory={activeCategory}  />
       <main className="flex-1">
         <FeaturedSection activeCategory={activeCategory} />
         <AnnouncementSection activeCategory={activeCategory} />

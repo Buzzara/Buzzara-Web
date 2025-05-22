@@ -11,13 +11,15 @@ const Header = () => {
   return (
     <header className="w-full py-4 px-4 md:px-8 bg-buzzara-background">
       <div className="container mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-        {/* Logo */}
+        {/* Logo linking to home */}
         <div className="flex items-center">
-          <img
-            src={LogoImg}
-            alt="Buzzara Logo"
-            className="h-8 md:h-10 object-contain"
-          />
+          <a href="/">
+            <img
+              src={LogoImg}
+              alt="Buzzara Logo"
+              className="h-8 md:h-10 object-contain"
+            />
+          </a>
         </div>
 
         <div className="flex flex-1 max-w-xl w-full gap-2">
@@ -40,13 +42,19 @@ const Header = () => {
 
         {/* Login button */}
         <div>
-          <Button
-            variant="outline"
-            className="border-buzzara-secondary text-buzzara-neutral hover:bg-buzzara-secondary hover:text-white bg-buzzara-secondary"
+          <a
+            href="https://painel.buzzara.com.br/login"
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            <User className="h-4 w-4 mr-2" />
-            Entrar
-          </Button>
+            <Button
+              variant="outline"
+              className="border-buzzara-secondary text-buzzara-neutral hover:bg-buzzara-secondary hover:text-white bg-buzzara-secondary"
+            >
+              <User className="h-4 w-4 mr-2" />
+              Entrar
+            </Button>
+          </a>
         </div>
       </div>
     </header>
