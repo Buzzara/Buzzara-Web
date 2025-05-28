@@ -8,14 +8,15 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
-import { useAds } from '@/hooks/useAds';
-import { AnuncioPublico } from '@/types/AnuncioPublico';
+import type { AnuncioPublico } from '@/types/AnuncioPublico';
 
-const PopularSection: React.FC = () => {
-  const { ads, loading } = useAds();
+interface PopularSectionProps {
+  anuncios: AnuncioPublico[];
+  loading: boolean;
+}
 
-  // não renderiza enquanto carrega ou se não houver anúncios
-  if (loading || ads.length === 0) return null;
+const PopularSection: React.FC<PopularSectionProps> = ({ anuncios, loading }) => {
+  if (loading || anuncios.length === 0) return null;
 
   return (
     <section className="py-8 px-4 md:px-8 relative">
@@ -24,7 +25,7 @@ const PopularSection: React.FC = () => {
         <div className="relative mt-8">
           <Carousel opts={{ align: 'start', loop: true }} className="w-full">
             <CarouselContent>
-              {ads.map((ad: AnuncioPublico) => (
+              {anuncios.map((ad) => (
                 <CarouselItem
                   key={ad.servicoID}
                   className="md:basis-1/2 lg:basis-1/3 xl:basis-1/4"
@@ -34,11 +35,11 @@ const PopularSection: React.FC = () => {
                       id={String(ad.servicoID)}
                       name={ad.nome}
                       image={ad.fotos?.[0]?.url || ''}
-                      rating={4.5}         // ajuste se vier da API
-                      reviews={12}         // ajuste se vier da API
-                      views={1000}         // ajuste se vier da API
+                      rating={4.5}
+                      reviews={12}
+                      views={1000}
                       price={{ current: ad.preco }}
-                      tag={null}           // ou ad.tag, se existir
+                      tag={null}
                     />
                   </div>
                 </CarouselItem>

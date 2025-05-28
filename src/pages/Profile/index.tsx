@@ -23,6 +23,8 @@ export default function ProfilePage() {
   const { id } = useParams<{ id: string }>();
   const { ads, loading } = useAds();
   const [views, setViews] = useState<number>(0);
+  const [filtro, setFiltro] = useState("");
+  const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
     setViews(getRandomViews());
@@ -46,17 +48,23 @@ export default function ProfilePage() {
         .join(", ")
     : "Sem localização";
 
+  const allMidia = [...anuncio.fotos, ...anuncio.videos];
+
   return (
     <div className="min-h-screen flex flex-col bg-buzzara-background text-white">
-      <Header />
+      <Header onSearch={setFiltro} />
 
       <main className="flex-1 py-8 px-4 md:px-8">
         <div className="container mx-auto">
           {/* Breadcrumb */}
           <div className="flex items-center text-sm text-gray-400 mb-6">
-            <Link to="/" className="hover:text-white">Home</Link>
+            <Link to="/" className="hover:text-white">
+              Home
+            </Link>
             <span className="mx-2">/</span>
-            <Link to="/" className="hover:text-white">{anuncio.categoria}</Link>
+            <Link to="/" className="hover:text-white">
+              {anuncio.categoria}
+            </Link>
             <span className="mx-2">/</span>
             <span>{anuncio.nomeAcompanhante}</span>
           </div>
@@ -66,36 +74,48 @@ export default function ProfilePage() {
             <div>
               <Carousel className="w-full mb-4">
                 <CarouselContent>
-                  {anuncio.fotos.map((f) => (
-                    <CarouselItem key={f.fotoAnuncioID}>
-                      <img
-                        src={f.url}
-                        alt={`Foto ${f.fotoAnuncioID}`}
-                        className="w-full aspect-square object-cover rounded-lg"
-                      />
-                    </CarouselItem>
-                  ))}
-                  {anuncio.videos.map((v) => (
-                    <CarouselItem key={v.videoAnuncioID}>
+                  <CarouselItem>
+                    {allMidia[activeIndex].url.includes(".mp4") ? (
                       <video
-                        src={v.url}
+                        src={allMidia[activeIndex].url}
                         controls
                         className="w-full aspect-square object-cover rounded-lg"
                       />
-                    </CarouselItem>
-                  ))}
+                    ) : (
+                      <img
+                        src={allMidia[activeIndex].url}
+                        alt={`Mídia ${activeIndex}`}
+                        className="w-full aspect-square object-cover rounded-lg"
+                      />
+                    )}
+                  </CarouselItem>
                 </CarouselContent>
                 <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white border-none" />
                 <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white border-none" />
               </Carousel>
+
               <div className="grid grid-cols-5 gap-2">
-                {anuncio.fotos.map((f) => (
-                  <img
-                    key={f.fotoAnuncioID}
-                    src={f.url}
-                    alt={`Thumb ${f.fotoAnuncioID}`}
-                    className="w-full aspect-square object-cover rounded cursor-pointer opacity-70 hover:opacity-100 transition-opacity"
-                  />
+                {allMidia.map((m, i) => (
+                  <div
+                    key={i}
+                    className="cursor-pointer opacity-70 hover:opacity-100 transition-opacity"
+                    onClick={() => setActiveIndex(i)}
+                  >
+                    {m.url.includes(".mp4") ? (
+                      <video
+                        src={m.url}
+                        className="w-full aspect-square object-cover rounded"
+                        muted
+                        playsInline
+                      />
+                    ) : (
+                      <img
+                        src={m.url}
+                        alt={`Thumb ${i}`}
+                        className="w-full aspect-square object-cover rounded"
+                      />
+                    )}
+                  </div>
                 ))}
               </div>
             </div>

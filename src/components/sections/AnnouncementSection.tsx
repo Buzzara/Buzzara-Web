@@ -1,7 +1,6 @@
 // src/components/sections/AnnouncementSection.tsx
 import React from 'react';
 import AnnouncementCard from '@/components/cards/AnnouncementCard';
-import { useAds } from '@/hooks/useAds';
 import type { AnuncioPublico } from '@/types/AnuncioPublico';
 import type { IAnnouncement } from '@/types';
 import {
@@ -14,14 +13,18 @@ import {
 
 interface AnnouncementSectionProps {
   activeCategory: string | null;
+  anuncios: AnuncioPublico[];
+  loading: boolean;
 }
 
-const AnnouncementSection: React.FC<AnnouncementSectionProps> = ({ activeCategory }) => {
-  const { ads, loading } = useAds();
-
+const AnnouncementSection: React.FC<AnnouncementSectionProps> = ({
+  activeCategory,
+  anuncios,
+  loading,
+}) => {
   if (loading) return null;
 
-  const mapped: IAnnouncement[] = ads.map((ad) => ({
+  const mapped: IAnnouncement[] = anuncios.map((ad) => ({
     id: String(ad.servicoID),
     title: ad.nomeAcompanhante,
     description: ad.descricao,

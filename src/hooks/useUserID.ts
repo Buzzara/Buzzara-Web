@@ -1,4 +1,3 @@
-// src/hooks/useUserAds.ts
 import { useState, useEffect } from "react";
 import { userGetAnunciosPorUsuario } from "@/api/userGetAnunciosPorUsuario";
 import type { AnuncioPublico } from "@/types/AnuncioPublico";

@@ -28,7 +28,6 @@ const Navigation: React.FC<NavigationProps> = ({
     { id: 'mulheres', name: 'Mulheres', filter: 'Mulheres' },
     { id: 'homens',   name: 'Homens',   filter: 'Homens'   },
     { id: 'trans',    name: 'Trans',    filter: 'Trans'    },
-    { id: 'casais',   name: 'Casais',   filter: 'Casais'   },
   ];
 
   return (
