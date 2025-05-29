@@ -15,6 +15,7 @@ import {
   Zap,
   DollarSign,
   AlertTriangle,
+  X,
 } from "lucide-react";
 import { useAds } from "@/hooks/useAds";
 
@@ -26,6 +27,8 @@ const ProfileDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { ads, loading } = useAds();
   const [views, setViews] = useState<number>(0);
+  const [modalUrl, setModalUrl] = useState<string | null>(null);
+  const [isVideo, setIsVideo] = useState<boolean>(false);
 
   useEffect(() => {
     setViews(getRandomViews());
@@ -56,6 +59,16 @@ const ProfileDetails: React.FC = () => {
   const featured = allMedia[0];
   const thumbs = allMedia.slice(1, 17);
   const remaining = allMedia.length - 1 - thumbs.length;
+
+  const openModal = (url: string, video: boolean) => {
+    setModalUrl(url);
+    setIsVideo(video);
+  };
+
+  const closeModal = () => {
+    setModalUrl(null);
+    setIsVideo(false);
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-buzzara-background text-white">
@@ -158,9 +171,13 @@ const ProfileDetails: React.FC = () => {
               <div className="relative pb-[150%] rounded-lg overflow-hidden">
                 {featured.isVideo ? (
                   <video
-                    controls
                     src={featured.url}
                     className="absolute inset-0 w-full h-full object-cover"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    controls
                   />
                 ) : (
                   <img
@@ -171,49 +188,45 @@ const ProfileDetails: React.FC = () => {
                 )}
               </div>
               <p className="mt-2 text-xs text-gray-600">
-                Verificado{" "}
-                {new Date(anuncio.dataCriacao).toLocaleDateString("pt-BR", {
+                Verificado {new Date(anuncio.dataCriacao).toLocaleDateString("pt-BR", {
                   month: "short",
                   year: "numeric",
                 })}
               </p>
             </div>
 
-            <div className="w-1/5 flex flex-col justify-between text-sm">
-              <div className="flex items-center space-x-2">
-                <Grid className="w-6 h-6 text-gray-700" />
-                <span className="font-semibold">{allMedia.length} TODOS</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Camera className="w-6 h-6 text-gray-700" />
-                <span className="font-semibold">
-                  {anuncio.fotos.length} FOTOS
-                </span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Video className="w-6 h-6 text-gray-700" />
-                <span className="font-semibold">
-                  {anuncio.videos.length} VÍDEOS
-                </span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Zap className="w-6 h-6 text-gray-700" />
-                <span className="font-semibold">33 EXCLUSIVOS</span>
-              </div>
-            </div>
+<div className="w-1/5 flex flex-col items-center justify-center text-sm mt-4 space-y-8">
+  <div className="flex flex-col items-center">
+    <Grid className="w-10 h-10 text-gray-700 mb-1" />
+    <span className="font-bold text-sm text-gray-900">{allMedia.length} TODOS</span>
+  </div>
+  <div className="flex flex-col items-center">
+    <Camera className="w-10 h-10 text-gray-700 mb-1" />
+    <span className="font-bold text-sm text-gray-900">{anuncio.fotos.length} FOTOS</span>
+  </div>
+  <div className="flex flex-col items-center">
+    <Video className="w-10 h-10 text-gray-700 mb-1" />
+    <span className="font-bold text-sm text-gray-900">{anuncio.videos.length} VÍDEOS</span>
+  </div>
+</div>
+
 
             <div className="flex-1 grid grid-cols-4 gap-2">
               {thumbs.map((m, i) => (
                 <div
                   key={i}
-                  className="w-full aspect-square rounded-lg overflow-hidden relative"
+                  onClick={() => openModal(m.url, m.isVideo)}
+                  className="w-full aspect-square rounded-lg overflow-hidden relative cursor-pointer"
                 >
                   {m.isVideo ? (
                     <video
                       src={m.url}
                       className="absolute inset-0 w-full h-full object-cover"
+                      autoPlay
                       muted
+                      loop
                       playsInline
+                      controls
                     />
                   ) : (
                     <img
@@ -233,6 +246,24 @@ const ProfileDetails: React.FC = () => {
           </div>
         </div>
 
+        {modalUrl && (
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center">
+            <button
+              className="absolute top-4 right-4 text-white text-xl"
+              onClick={closeModal}
+            >
+              <X className="w-8 h-8" />
+            </button>
+            <div className="max-w-3xl w-full p-4">
+              {isVideo ? (
+                <video src={modalUrl} controls className="w-full rounded-lg" autoPlay />
+              ) : (
+                <img src={modalUrl} alt="Visualização" className="w-full rounded-lg" />
+              )}
+            </div>
+          </div>
+        )}
+
         <div className="rounded-lg bg-gray-200 text-gray-800 p-6">
           <h3 className="text-2xl font-semibold mb-4">Anúncios Relacionados</h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -251,12 +282,8 @@ const ProfileDetails: React.FC = () => {
                     className="w-16 h-16 rounded-full object-cover mr-4"
                   />
                   <div>
-                    <h4 className="font-semibold text-lg mb-1">
-                      {a.nomeAcompanhante}
-                    </h4>
-                    <p className="text-sm text-gray-500 mb-2">
-                      {a.nome ?? a.categoria}
-                    </p>
+                    <h4 className="font-semibold text-lg mb-1">{a.nomeAcompanhante}</h4>
+                    <p className="text-sm text-gray-500 mb-2">{a.nome ?? a.categoria}</p>
                     <div className="flex items-center space-x-1 text-gray-700">
                       <DollarSign className="w-5 h-5" />
                       <span>R${a.preco.toFixed(2)}</span>

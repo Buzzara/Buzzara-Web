@@ -1,12 +1,13 @@
-
 import React from 'react';
-import { Star, Eye } from 'lucide-react';
+import { Star, Eye, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
+import { Badge } from '@/components/ui/badge';
 
 interface AdCardProps {
   id: string;
   name: string;
+  description: string;
   image: string;
   rating: number;
   reviews: number;
@@ -19,19 +20,25 @@ interface AdCardProps {
     text: string;
     type: 'new' | 'hot' | 'sale';
   };
+  category?: string;
+  location?: string;
+  postedDate?: string;
 }
 
 const AdCard: React.FC<AdCardProps> = ({
   id,
   name,
+  description,
   image,
   rating,
   reviews,
   views,
   price,
-  tag
+  tag,
+  category,
+  location,
+  postedDate
 }) => {
-  // Function to get tag background color
   const getTagColor = (type: 'new' | 'hot' | 'sale') => {
     const colors = {
       new: 'bg-buzzara-tag-new',
@@ -42,67 +49,74 @@ const AdCard: React.FC<AdCardProps> = ({
   };
 
   return (
-    <Link to={`/profile/${id}`} className="block">
-      <div className="ad-card group">
-        {/* Tag */}
-        {tag && (
-          <div className={cn('tag', getTagColor(tag.type))}>
-            {tag.text}
-          </div>
-        )}
-        
-        {/* Image */}
-        <div className="aspect-square overflow-hidden">
-          <img 
-            src={image} 
-            alt={name}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-        </div>
-        
-        {/* Content */}
-        <div className="p-4">
-          {/* Name */}
-          <h3 className="text-lg font-semibold text-white mb-2">{name}</h3>
-          
-          {/* Rating */}
-          <div className="flex items-center mb-3">
-            <div className="flex">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  className={cn(
-                    "h-4 w-4",
-                    i < Math.floor(rating) ? "text-buzzara-secondary fill-buzzara-secondary" : "text-gray-400"
-                  )}
-                />
-              ))}
-            </div>
-            <span className="text-sm text-gray-400 ml-2">({reviews})</span>
-          </div>
-          
-          {/* Views - added */}
-          {views !== undefined && (
-            <div className="flex items-center mb-3">
-              <Eye className="h-4 w-4 text-gray-400 mr-1" />
-              <span className="text-sm text-gray-400">{views} visualizações</span>
+    <Link to={`/profile/${id}`} className="block h-full">
+      <div className="flex flex-col h-full bg-buzzara-card rounded-lg overflow-hidden shadow-md transition-shadow hover:shadow-lg">
+        {/* Imagem */}
+        <div className="relative">
+          {tag && (
+            <div className={cn(
+              'absolute top-2 right-2 py-1 px-3 text-xs font-semibold rounded-full text-white z-10',
+              getTagColor(tag.type)
+            )}>
+              {tag.text}
             </div>
           )}
-          
-          {/* Price */}
-          {price && (
+          <div className="aspect-[4/3] overflow-hidden">
+            <img 
+              src={image} 
+              alt={name}
+              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+          </div>
+        </div>
+
+        {/* Conteúdo */}
+        <div className="p-4 flex flex-col justify-between flex-1">
+          {/* Título e descrição */}
+          <div>
+            <h3 className="text-white font-semibold text-base">{name}</h3>
+            <p className="text-sm text-gray-300 line-clamp-2">{description}</p>
+          </div>
+
+          {/* Avaliação e visualizações */}
+          <div className="flex items-center justify-between mt-3 mb-1">
             <div className="flex items-center">
+              <Star className="h-4 w-4 text-buzzara-secondary fill-buzzara-secondary" />
+              <span className="text-sm text-white ml-1">{rating}</span>
+              <span className="text-xs text-gray-400 ml-1">({reviews})</span>
+            </div>
+            <div className="flex items-center text-gray-300">
+              <Eye className="h-4 w-4 mr-1" />
+              <span className="text-xs">{views ?? 0}</span>
+            </div>
+          </div>
+
+          {/* Localização e categoria */}
+          <div className="mt-2">
+            {location && (
+              <div className="text-xs text-gray-400">{location}</div>
+            )}
+            {category && (
+              <Badge className="bg-gray-700 text-xs font-normal mt-1">
+                {category}
+              </Badge>
+            )}
+          </div>
+
+          {/* Publicado + Preço */}
+          <div className="flex justify-between items-center mt-4 text-xs text-gray-400">
+            {postedDate && (
+              <div className="flex items-center">
+                <Clock className="h-3 w-3 mr-1" />
+                <span>Publicado: {postedDate}</span>
+              </div>
+            )}
+            {price && (
               <span className="text-lg font-bold text-buzzara-secondary">
                 R${price.current}
               </span>
-              
-              {price.original && (
-                <span className="ml-2 text-sm text-gray-400 line-through">
-                  R${price.original}
-                </span>
-              )}
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </Link>

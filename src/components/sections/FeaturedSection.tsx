@@ -1,23 +1,30 @@
 // src/components/sections/FeaturedSection.tsx
-import React from 'react';
-import AdCard from '@/components/cards/AdCard';
+import React from "react";
+import AdCard from "@/components/cards/AdCard";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from '@/components/ui/carousel';
-import type { AnuncioPublico } from '@/types/AnuncioPublico';
+} from "@/components/ui/carousel";
+import type { AnuncioPublico } from "@/types/AnuncioPublico";
 
 interface FeaturedSectionProps {
   anuncios: AnuncioPublico[];
   loading: boolean;
 }
 
-const FeaturedSection: React.FC<FeaturedSectionProps> = ({ anuncios, loading }) => {
+const FeaturedSection: React.FC<FeaturedSectionProps> = ({
+  anuncios,
+  loading,
+}) => {
   if (loading || anuncios.length === 0) {
     return null;
+  }
+
+  function getRandomViews(min = 100, max = 5000): number {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
   return (
@@ -25,7 +32,7 @@ const FeaturedSection: React.FC<FeaturedSectionProps> = ({ anuncios, loading }) 
       <div className="container mx-auto">
         <h2 className="featured-section-title text-white">Em Destaque</h2>
         <div className="relative mt-8">
-          <Carousel opts={{ align: 'start', loop: true }} className="w-full">
+          <Carousel opts={{ align: "start", loop: true }} className="w-full">
             <CarouselContent>
               {anuncios.map((ad) => (
                 <CarouselItem
@@ -33,16 +40,27 @@ const FeaturedSection: React.FC<FeaturedSectionProps> = ({ anuncios, loading }) 
                   className="md:basis-1/2 lg:basis-1/3 xl:basis-1/4"
                 >
                   <div className="p-1">
-                    <AdCard
-                      id={String(ad.servicoID)}
-                      name={ad.nome}
-                      image={ad.fotos?.[0]?.url || ''}
-                      rating={4.5}
-                      reviews={12}
-                      views={1000}
-                      price={{ current: ad.preco }}
-                      tag={null}
-                    />
+                    <div className="h-[480px]">
+                      <div className="h-full">
+                        <AdCard
+                          id={String(ad.servicoID)}
+                          name={ad.nome}
+                          description={ad.descricao}
+                          image={ad.fotos?.[0]?.url || ""}
+                          rating={4.5}
+                          reviews={12}
+                          views={getRandomViews()}
+                          price={{ current: ad.preco }}
+                          tag={null}
+                          category={ad.categoria || "Outros"}
+                          location={
+                            ad.localizacao
+                              ? `${ad.localizacao.cidade}, ${ad.localizacao.estado}`
+                              : ""
+                          }
+                        />
+                      </div>
+                    </div>
                   </div>
                 </CarouselItem>
               ))}

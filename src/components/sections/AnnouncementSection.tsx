@@ -11,6 +11,11 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 
+// 👇 Adiciona função auxiliar
+function getRandomViews(min = 100, max = 5000): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 interface AnnouncementSectionProps {
   activeCategory: string | null;
   anuncios: AnuncioPublico[];
@@ -37,7 +42,7 @@ const AnnouncementSection: React.FC<AnnouncementSectionProps> = ({
     postedDate: ad.dataCriacao.split('T')[0],
     rating: 0,
     reviews: 0,
-    views: 0,
+    views: getRandomViews(), // 👈 aqui fica dinâmico
     tag: undefined,
   }));
 
@@ -63,7 +68,11 @@ const AnnouncementSection: React.FC<AnnouncementSectionProps> = ({
                   key={announcement.id}
                   className="md:basis-1/2 lg:basis-1/3 xl:basis-1/4 p-2"
                 >
-                  <AnnouncementCard announcement={announcement} />
+                  <div className="h-[480px]">
+                    <div className="h-full">
+                      <AnnouncementCard announcement={announcement} />
+                    </div>
+                  </div>
                 </CarouselItem>
               ))}
             </CarouselContent>
