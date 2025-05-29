@@ -50,7 +50,9 @@ const ProfileDetails: React.FC = () => {
 
   const loc = anuncio.localizacao;
   const locationLabel = loc
-    ? [loc.endereco, loc.bairro, loc.cidade, loc.estado].filter(Boolean).join(", ")
+    ? [loc.endereco, loc.bairro, loc.cidade, loc.estado]
+        .filter(Boolean)
+        .join(", ")
     : "Sem localização";
 
   const photos = anuncio.fotos.map((f) => ({ url: f.url, isVideo: false }));
@@ -188,28 +190,34 @@ const ProfileDetails: React.FC = () => {
                 )}
               </div>
               <p className="mt-2 text-xs text-gray-600">
-                Verificado {new Date(anuncio.dataCriacao).toLocaleDateString("pt-BR", {
+                Verificado{" "}
+                {new Date(anuncio.dataCriacao).toLocaleDateString("pt-BR", {
                   month: "short",
                   year: "numeric",
                 })}
               </p>
             </div>
 
-<div className="w-1/5 flex flex-col items-center justify-center text-sm mt-4 space-y-8">
-  <div className="flex flex-col items-center">
-    <Grid className="w-10 h-10 text-gray-700 mb-1" />
-    <span className="font-bold text-sm text-gray-900">{allMedia.length} TODOS</span>
-  </div>
-  <div className="flex flex-col items-center">
-    <Camera className="w-10 h-10 text-gray-700 mb-1" />
-    <span className="font-bold text-sm text-gray-900">{anuncio.fotos.length} FOTOS</span>
-  </div>
-  <div className="flex flex-col items-center">
-    <Video className="w-10 h-10 text-gray-700 mb-1" />
-    <span className="font-bold text-sm text-gray-900">{anuncio.videos.length} VÍDEOS</span>
-  </div>
-</div>
-
+            <div className="w-1/5 flex flex-col items-center justify-center text-sm mt-4 space-y-8">
+              <div className="flex flex-col items-center">
+                <Grid className="w-10 h-10 text-gray-700 mb-1" />
+                <span className="font-bold text-sm text-gray-900">
+                  {allMedia.length} TODOS
+                </span>
+              </div>
+              <div className="flex flex-col items-center">
+                <Camera className="w-10 h-10 text-gray-700 mb-1" />
+                <span className="font-bold text-sm text-gray-900">
+                  {anuncio.fotos.length} FOTOS
+                </span>
+              </div>
+              <div className="flex flex-col items-center">
+                <Video className="w-10 h-10 text-gray-700 mb-1" />
+                <span className="font-bold text-sm text-gray-900">
+                  {anuncio.videos.length} VÍDEOS
+                </span>
+              </div>
+            </div>
 
             <div className="flex-1 grid grid-cols-4 gap-2">
               {thumbs.map((m, i) => (
@@ -256,9 +264,18 @@ const ProfileDetails: React.FC = () => {
             </button>
             <div className="max-w-3xl w-full p-4">
               {isVideo ? (
-                <video src={modalUrl} controls className="w-full rounded-lg" autoPlay />
+                <video
+                  src={modalUrl}
+                  controls
+                  className="w-full rounded-lg"
+                  autoPlay
+                />
               ) : (
-                <img src={modalUrl} alt="Visualização" className="w-full rounded-lg" />
+                <img
+                  src={modalUrl}
+                  alt="Visualização"
+                  className="w-full rounded-lg"
+                />
               )}
             </div>
           </div>
@@ -282,8 +299,12 @@ const ProfileDetails: React.FC = () => {
                     className="w-16 h-16 rounded-full object-cover mr-4"
                   />
                   <div>
-                    <h4 className="font-semibold text-lg mb-1">{a.nomeAcompanhante}</h4>
-                    <p className="text-sm text-gray-500 mb-2">{a.nome ?? a.categoria}</p>
+                    <h4 className="font-semibold text-lg mb-1">
+                      {a.nomeAcompanhante}
+                    </h4>
+                    <p className="text-sm text-gray-500 mb-2">
+                      {a.nome ?? a.categoria}
+                    </p>
                     <div className="flex items-center space-x-1 text-gray-700">
                       <DollarSign className="w-5 h-5" />
                       <span>R${a.preco.toFixed(2)}</span>

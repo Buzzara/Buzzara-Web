@@ -1,4 +1,6 @@
+// src/components/layout/Footer.tsx
 import React from "react";
+import { Link } from "react-router-dom";
 import logoFooter from "../../assets/images/logoFooter.png";
 
 const Footer: React.FC = () => {
@@ -56,7 +58,7 @@ const Footer: React.FC = () => {
             </ul>
           </div>
 
-          {/* Coluna 3 com logo ao lado */}
+          {/* Coluna 3 com logo clicável */}
           <div className="flex flex-col md:flex-row md:items-start md:justify-between">
             <div>
               <h3 className="text-lg font-semibold text-white mb-4">
@@ -81,17 +83,20 @@ const Footer: React.FC = () => {
                 </li>
               </ul>
             </div>
-            <img
-              src={logoFooter}
-              alt="Buzzara Logo"
-              className="
-                w-full max-w-[120px]      /* ocupa até 120px de largura em mobile */
-                md:max-w-[160px]         /* até 160px em md+ */
-                h-auto                   /* mantém proporção original */
-                mt-6 md:mt-0 md:ml-4      /* espaçamento igual ao anterior */
-                object-contain           /* garante que a imagem não estique */
-              "
-            />
+
+            {/* LINK para página inicial */}
+            <Link to="/" className="mt-6 md:mt-0 md:ml-4 block">
+              <img
+                src={logoFooter}
+                alt="Buzzara Logo"
+                className="
+                  w-full max-w-[120px]      /* até 120px em mobile */
+                  md:max-w-[160px]         /* até 160px em md+ */
+                  h-auto                   /* mantém proporção */
+                  object-contain           /* não estica */
+                "
+              />
+            </Link>
           </div>
         </div>
 
