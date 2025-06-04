@@ -38,15 +38,15 @@ const ProfileDetails: React.FC = () => {
     setViews(getRandomViews());
   }, []);
 
-  // 1) Encontrar o anúncio a partir do servicoID
+  // 1) Buscar anúncio pelo servicoID
   const anuncio = ads.find((a) => a.servicoID === Number(id)) as
     | AnuncioPublico
     | undefined;
 
-  // 2) Extrair o usuarioID para passar ao hook (caso 'anuncio' exista)
+  // 2) Extrair usuarioID para o hook de perfil
   const usuarioId = anuncio?.usuarioID;
 
-  // 3) Chamar o hook SEMPRE, para obter dados do perfil do usuário
+  // 3) Hook que faz polling de perfil.estaOnline
   const {
     perfil,
     loading: loadingPerfil,
@@ -56,7 +56,7 @@ const ProfileDetails: React.FC = () => {
   // Enquanto anúncios carregam, não renderiza nada
   if (loading) return null;
 
-  // Se não encontrou anúncio, exibe mensagem
+  // Se não encontrou anúncio, mostra mensagem
   if (!anuncio) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-buzzara-background text-white">
@@ -65,7 +65,6 @@ const ProfileDetails: React.FC = () => {
     );
   }
 
-  // Se ocorreu erro ao buscar perfil, apenas logamos e seguimos exibindo anúncio sem perfil
   if (erroPerfil) {
     console.warn("Erro ao buscar perfil público:", erroPerfil);
   }
@@ -82,13 +81,26 @@ const ProfileDetails: React.FC = () => {
   const remaining = allMedia.length - 1 - thumbs.length;
 
   // ========== Dados do perfil ==========
-  // Supondo que, em PerfilPublico, fotoCapaUrl e telefone existam
   const profileCover = perfil?.fotoCapaUrl;
   const profileLocation: string | undefined = perfil?.localizacao ?? undefined;
   const locationLabel = profileLocation ? profileLocation : "Sem localização";
   const profilePhone = perfil?.telefone ?? "";
 
-  // Funções para modal e telefone
+  // Lógica “fora de expediente”
+  // Ajuste esses valores conforme o seu horário de expediente
+  const agora = new Date();
+  const horaAtual = agora.getHours(); // 0–23
+  const INICIO_EXPEDIENTE = 8;  // 08:00
+  const FIM_EXPEDIENTE = 20;    // 20:00
+
+  // Estamos “fora do expediente” se:
+  //  - perfil existe e estaOffline (ou está carregado e .estaOnline === false)
+  //  - e a hora atual for antes de 08 ou igual/maior que 20
+  const estaOffline = !loadingPerfil && perfil && !perfil.estaOnline;
+  const estaForaDeExpediente =
+    estaOffline && (horaAtual < INICIO_EXPEDIENTE || horaAtual >= FIM_EXPEDIENTE);
+
+  // Funções auxiliares
   const openModal = (url: string, video: boolean) => {
     setModalUrl(url);
     setIsVideo(video);
@@ -146,7 +158,11 @@ const ProfileDetails: React.FC = () => {
                   <span>Carregando status…</span>
                 </span>
               )}
-              <span className="text-red-500 text-sm">Fora de expediente</span>
+
+              {/* Exibe “Fora de expediente” apenas se de fato estiver offline e fora do horário */}
+              {estaForaDeExpediente && (
+                <span className="text-red-500 text-sm">Fora de expediente</span>
+              )}
             </div>
 
             <h2 className="text-2xl font-bold uppercase mt-2 text-gray-900">
@@ -199,31 +215,40 @@ const ProfileDetails: React.FC = () => {
               ))}
             </div>
 
+            {/* Botão “Ver Telefone” exibe telefone do perfil */}
             <div className="flex space-x-4">
               <button
                 onClick={toggleShowPhone}
                 className="flex items-center space-x-2 px-4 py-2 bg-black/75 hover:bg-black rounded-full text-white"
               >
                 <Phone className="w-4 h-4" />
-                <span>{showPhone ? perfil?.telefone : "Ver Telefone"}</span>
+                <span>{showPhone ? profilePhone : "Ver Telefone"}</span>
               </button>
             </div>
           </section>
         </div>
 
+        {/* ====== Seção de Descrição (Perfil + Anúncio) ====== */}
         <div className="rounded-lg bg-gray-200 text-gray-800 p-6">
           <h3 className="text-2xl font-semibold mb-4">Descrição</h3>
 
           {!loadingPerfil && perfil?.descricao && (
             <div className="mb-4">
-              
+              <h4 className="text-lg font-medium text-gray-900 mb-1">
+                Sobre o Usuário:
+              </h4>
               <div className="text-gray-700 whitespace-pre-line">
                 {perfil.descricao}
               </div>
             </div>
           )}
+
+          <div className="text-gray-700 whitespace-pre-line">
+            {anuncio.descricao}
+          </div>
         </div>
 
+        {/* ====== Demais seções (galeria, modal, anúncios relacionados etc.) ====== */}
         <div className="rounded-lg bg-gray-200 text-gray-800 p-6">
           <div className="flex gap-6">
             <div className="w-1/4">
@@ -231,7 +256,7 @@ const ProfileDetails: React.FC = () => {
                 {featured?.isVideo ? (
                   <video
                     src={featured.url}
-                    className="absolute inset-0 w-full h-full object-cover"
+                    className="absolute inset-0 w-full h-full	object-cover"
                     autoPlay
                     muted
                     loop
