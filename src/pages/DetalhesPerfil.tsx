@@ -18,6 +18,9 @@ import {
   X,
 } from "lucide-react";
 import { useAds } from "@/hooks/useAds";
+import { usePerfilPublico } from "@/hooks/usePublicoPerfil";
+import type { AnuncioPublico } from "@/types/AnuncioPublico";
+import type { PerfilPublico } from "@/types/PerfilPublico";
 
 function getRandomViews(min = 100, max = 5000): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -29,14 +32,31 @@ const ProfileDetails: React.FC = () => {
   const [views, setViews] = useState<number>(0);
   const [modalUrl, setModalUrl] = useState<string | null>(null);
   const [isVideo, setIsVideo] = useState<boolean>(false);
+  const [showPhone, setShowPhone] = useState<boolean>(false);
 
   useEffect(() => {
     setViews(getRandomViews());
   }, []);
 
+  // 1) Encontrar o anúncio a partir do servicoID
+  const anuncio = ads.find((a) => a.servicoID === Number(id)) as
+    | AnuncioPublico
+    | undefined;
+
+  // 2) Extrair o usuarioID para passar ao hook (caso 'anuncio' exista)
+  const usuarioId = anuncio?.usuarioID;
+
+  // 3) Chamar o hook SEMPRE, para obter dados do perfil do usuário
+  const {
+    perfil,
+    loading: loadingPerfil,
+    erro: erroPerfil,
+  } = usePerfilPublico(usuarioId);
+
+  // Enquanto anúncios carregam, não renderiza nada
   if (loading) return null;
 
-  const anuncio = ads.find((a) => a.servicoID === Number(id));
+  // Se não encontrou anúncio, exibe mensagem
   if (!anuncio) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-buzzara-background text-white">
@@ -45,15 +65,14 @@ const ProfileDetails: React.FC = () => {
     );
   }
 
-  const nota = (anuncio as any).nota ?? 3.3;
-  const pct = Math.min(Math.max((nota / 5) * 100, 0), 100);
+  // Se ocorreu erro ao buscar perfil, apenas logamos e seguimos exibindo anúncio sem perfil
+  if (erroPerfil) {
+    console.warn("Erro ao buscar perfil público:", erroPerfil);
+  }
 
-  const loc = anuncio.localizacao;
-  const locationLabel = loc
-    ? [loc.endereco, loc.bairro, loc.cidade, loc.estado]
-        .filter(Boolean)
-        .join(", ")
-    : "Sem localização";
+  // ========== Dados do anúncio ==========
+  const notaAnuncio = (anuncio as any).nota ?? 3.3;
+  const pctAnuncio = Math.min(Math.max((notaAnuncio / 5) * 100, 0), 100);
 
   const photos = anuncio.fotos.map((f) => ({ url: f.url, isVideo: false }));
   const videos = anuncio.videos.map((v) => ({ url: v.url, isVideo: true }));
@@ -62,56 +81,80 @@ const ProfileDetails: React.FC = () => {
   const thumbs = allMedia.slice(1, 17);
   const remaining = allMedia.length - 1 - thumbs.length;
 
+  // ========== Dados do perfil ==========
+  // Supondo que, em PerfilPublico, fotoCapaUrl e telefone existam
+  const profileCover = perfil?.fotoCapaUrl;
+  const profileLocation: string | undefined = perfil?.localizacao ?? undefined;
+  const locationLabel = profileLocation ? profileLocation : "Sem localização";
+  const profilePhone = perfil?.telefone ?? "";
+
+  // Funções para modal e telefone
   const openModal = (url: string, video: boolean) => {
     setModalUrl(url);
     setIsVideo(video);
   };
-
   const closeModal = () => {
     setModalUrl(null);
     setIsVideo(false);
+  };
+  const toggleShowPhone = () => {
+    setShowPhone((prev) => !prev);
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-buzzara-background text-white">
       <Header />
 
+      {/* Capa de perfil (prioriza foto do perfil, fallback para foto do anúncio) */}
       <div className="h-56 bg-gray-700">
         <img
-          src={anuncio.fotoCapaUrl}
-          alt="Capa"
+          src={profileCover ?? anuncio.fotoCapaUrl}
+          alt="Capa do Perfil"
           className="object-cover w-full h-full"
         />
       </div>
 
       <main className="container mx-auto px-4 md:px-8 mt-8 space-y-8">
+        {/* ====== Cabeçalho do anúncio + dados do perfil ====== */}
         <div className="relative bg-gray-200 text-gray-800 rounded-lg p-6 flex flex-col md:flex-row gap-8">
           <aside className="md:w-1/3 relative pt-16">
             <div className="absolute -top-12 left-6 w-24 h-24 rounded-full border-4 border-white overflow-hidden">
               <img
                 src={anuncio.fotoPerfilUrl}
-                alt="Perfil"
+                alt="Perfil do Anunciante"
                 className="object-cover w-full h-full"
               />
             </div>
+
+            {/* Status online/offline do perfil */}
             <div className="space-y-1">
-              <span className="flex items-center space-x-2 text-gray-600 text-sm">
-                <span className="w-2 h-2 bg-gray-500 rounded-full inline-block" />
-                <span>Offline há {views} minutos</span>
-              </span>
+              {!loadingPerfil && perfil ? (
+                perfil.estaOnline ? (
+                  <span className="flex items-center space-x-2 text-green-600 text-sm">
+                    <span className="w-2 h-2 bg-green-500 rounded-full inline-block" />
+                    <span>Online agora</span>
+                  </span>
+                ) : (
+                  <span className="flex items-center space-x-2 text-gray-600 text-sm">
+                    <span className="w-2 h-2 bg-gray-500 rounded-full inline-block" />
+                    <span>Offline há {views} minutos</span>
+                  </span>
+                )
+              ) : (
+                <span className="flex items-center space-x-2 text-gray-500 text-sm">
+                  <span className="w-2 h-2 bg-gray-300 rounded-full inline-block animate-pulse" />
+                  <span>Carregando status…</span>
+                </span>
+              )}
               <span className="text-red-500 text-sm">Fora de expediente</span>
             </div>
+
             <h2 className="text-2xl font-bold uppercase mt-2 text-gray-900">
               {anuncio.nomeAcompanhante}
             </h2>
-            <p className="uppercase text-gray-600">
-              {anuncio.nome ?? anuncio.categoria}
-            </p>
+
+            {/* Localização vinda do perfil */}
             <div className="mt-4 space-y-2 text-gray-600">
-              <div className="flex items-center space-x-2">
-                <MapPin className="w-5 h-5" />
-                <span>Possui Local</span>
-              </div>
               <div className="flex items-center space-x-2">
                 <MapPin className="w-5 h-5" />
                 <span>{locationLabel}</span>
@@ -130,31 +173,39 @@ const ProfileDetails: React.FC = () => {
                 <span>Não possui denúncias</span>
               </div>
             </div>
+
             <div className="flex items-center space-x-4">
               <div className="flex-1 h-3 bg-gray-400 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-yellow-400"
-                  style={{ width: `${pct}%` }}
+                  style={{ width: `${pctAnuncio}%` }}
                 />
               </div>
-              <span className="font-bold text-gray-900">{nota.toFixed(1)}</span>
+              <span className="font-bold text-gray-900">
+                {notaAnuncio.toFixed(1)}
+              </span>
             </div>
+
             <div className="flex items-center space-x-1">
               {Array.from({ length: 5 }).map((_, i) => (
                 <Star
                   key={i}
                   className={
-                    i < Math.round(nota)
+                    i < Math.round(notaAnuncio)
                       ? "w-5 h-5 text-black"
                       : "w-5 h-5 text-gray-400"
                   }
                 />
               ))}
             </div>
+
             <div className="flex space-x-4">
-              <button className="flex items-center space-x-2 px-4 py-2 bg-black/75 hover:bg-black rounded-full text-white">
+              <button
+                onClick={toggleShowPhone}
+                className="flex items-center space-x-2 px-4 py-2 bg-black/75 hover:bg-black rounded-full text-white"
+              >
                 <Phone className="w-4 h-4" />
-                <span>Ver Telefone</span>
+                <span>{showPhone ? perfil?.telefone : "Ver Telefone"}</span>
               </button>
             </div>
           </section>
@@ -162,16 +213,22 @@ const ProfileDetails: React.FC = () => {
 
         <div className="rounded-lg bg-gray-200 text-gray-800 p-6">
           <h3 className="text-2xl font-semibold mb-4">Descrição</h3>
-          <div className="text-gray-700 whitespace-pre-line">
-            {anuncio.descricao}
-          </div>
+
+          {!loadingPerfil && perfil?.descricao && (
+            <div className="mb-4">
+              
+              <div className="text-gray-700 whitespace-pre-line">
+                {perfil.descricao}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="rounded-lg bg-gray-200 text-gray-800 p-6">
           <div className="flex gap-6">
             <div className="w-1/4">
               <div className="relative pb-[150%] rounded-lg overflow-hidden">
-                {featured.isVideo ? (
+                {featured?.isVideo ? (
                   <video
                     src={featured.url}
                     className="absolute inset-0 w-full h-full object-cover"
@@ -183,7 +240,7 @@ const ProfileDetails: React.FC = () => {
                   />
                 ) : (
                   <img
-                    src={featured.url}
+                    src={featured?.url}
                     alt="Destaque"
                     className="absolute inset-0 w-full h-full object-cover"
                   />
@@ -229,7 +286,7 @@ const ProfileDetails: React.FC = () => {
                   {m.isVideo ? (
                     <video
                       src={m.url}
-                      className="absolute inset-0 w-full h-full object-cover"
+                      className="absolute inset-0 w-full h-full	object-cover"
                       autoPlay
                       muted
                       loop
@@ -315,6 +372,7 @@ const ProfileDetails: React.FC = () => {
           </div>
         </div>
 
+        {/* ====== Botão “Denunciar Anúncio” ====== */}
         <div className="flex justify-center">
           <button className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
             <AlertTriangle className="w-5 h-5" />

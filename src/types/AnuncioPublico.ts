@@ -21,6 +21,7 @@ export interface VideoAnuncioDTO {
 
 export interface AnuncioPublico {
   servicoID: number;
+  usuarioID: number;
   nome: string;
   descricao: string;
   preco: number;
@@ -29,6 +30,7 @@ export interface AnuncioPublico {
   disponibilidade: string;
   idade: number;
   peso: number;
+  estaOnline: boolean;
   altura: number;
   dataCriacao: string;
   fotoPerfilUrl: string;
