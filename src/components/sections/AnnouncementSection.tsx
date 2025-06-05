@@ -11,7 +11,7 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 
-// 👇 Adiciona função auxiliar
+// 👉 Função auxiliar para gerar views aleatórias
 function getRandomViews(min = 100, max = 5000): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -31,7 +31,11 @@ const AnnouncementSection: React.FC<AnnouncementSectionProps> = ({
 
   const mapped: IAnnouncement[] = anuncios.map((ad) => ({
     id: String(ad.servicoID),
-    title: ad.nomeAcompanhante,
+
+    // ⬇️ Troquei de ad.nomeAcompanhante para ad.nome (título do anúncio)
+    //    Se o seu AnuncioPublico tiver outro campo para título, use-o aqui.
+    title: ad.nome,
+
     description: ad.descricao,
     image: ad.fotos[0]?.url ?? '',
     price: ad.preco,
@@ -42,7 +46,7 @@ const AnnouncementSection: React.FC<AnnouncementSectionProps> = ({
     postedDate: ad.dataCriacao.split('T')[0],
     rating: 0,
     reviews: 0,
-    views: getRandomViews(), // 👈 aqui fica dinâmico
+    views: getRandomViews(), // aqui continua dinâmico
     tag: undefined,
   }));
 
