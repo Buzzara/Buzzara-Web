@@ -12,7 +12,6 @@ import {
   Grid,
   Camera,
   Video,
-  Zap,
   DollarSign,
   AlertTriangle,
   X,
@@ -22,8 +21,14 @@ import { usePerfilPublico } from "@/hooks/usePublicoPerfil";
 import type { AnuncioPublico } from "@/types/AnuncioPublico";
 import type { PerfilPublico } from "@/types/PerfilPublico";
 
+// Função auxiliar para gerar "Offline há X minutos"
 function getRandomViews(min = 100, max = 5000): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+// Função auxiliar para gerar nota aleatória entre 0.0 e 5.0 (com uma casa decimal)
+function getRandomNota(): number {
+  return parseFloat((Math.random() * 5).toFixed(1));
 }
 
 const ProfileDetails: React.FC = () => {
@@ -34,29 +39,51 @@ const ProfileDetails: React.FC = () => {
   const [isVideo, setIsVideo] = useState<boolean>(false);
   const [showPhone, setShowPhone] = useState<boolean>(false);
 
+  // Estado para nota do anúncio e para a porcentagem que define a largura da barra
+  const [notaAnuncio, setNotaAnuncio] = useState<number>(0);
+  const [pctAnuncio, setPctAnuncio] = useState<number>(0);
+
+  // 1) Ao montar a página, define um valor aleatório para "views" e
+  //    inicializa nota/proporção apenas uma vez (antes de sabermos qual é o 'anuncio')
   useEffect(() => {
     setViews(getRandomViews());
   }, []);
 
-  // 1) Buscar anúncio pelo servicoID
+  // 2) Assim que o 'anuncio' for carregado (mudança em ads ou em id), 
+  //    gere um valor randômico para a nota daquele perfil específico.
+  useEffect(() => {
+    // Encontrar o anúncio correspondente ao ID
+    const anuncioCorrente = ads.find((a) => a.servicoID === Number(id)) as
+      | AnuncioPublico
+      | undefined;
+
+    // Se existir anúncio, gere uma nota randômica só para ele
+    if (anuncioCorrente) {
+      const novaNota = getRandomNota();
+      setNotaAnuncio(novaNota);
+      setPctAnuncio(Math.min(Math.max((novaNota / 5) * 100, 0), 100));
+    }
+  }, [ads, id]);
+
+  // 3) Buscar anúncio pelo servicoID (igual a antes)
   const anuncio = ads.find((a) => a.servicoID === Number(id)) as
     | AnuncioPublico
     | undefined;
 
-  // 2) Extrair usuarioID para o hook de perfil
+  // 4) Extrair usuarioID para o hook de perfil
   const usuarioId = anuncio?.usuarioID;
 
-  // 3) Hook que faz polling de perfil.estaOnline
+  // 5) Hook que faz polling de perfil.estaOnline
   const {
     perfil,
     loading: loadingPerfil,
     erro: erroPerfil,
   } = usePerfilPublico(usuarioId);
 
-  // Enquanto anúncios carregam, não renderiza nada
+  // Enquanto os anúncios carregam, não renderiza nada
   if (loading) return null;
 
-  // Se não encontrou anúncio, mostra mensagem
+  // Se não encontrou anúncio, mostra mensagem de erro
   if (!anuncio) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-buzzara-background text-white">
@@ -69,10 +96,7 @@ const ProfileDetails: React.FC = () => {
     console.warn("Erro ao buscar perfil público:", erroPerfil);
   }
 
-  // ========== Dados do anúncio ==========
-  const notaAnuncio = (anuncio as any).nota ?? 3.3;
-  const pctAnuncio = Math.min(Math.max((notaAnuncio / 5) * 100, 0), 100);
-
+  // ========== Dados do anúncio (fotos, vídeos etc.) ==========
   const photos = anuncio.fotos.map((f) => ({ url: f.url, isVideo: false }));
   const videos = anuncio.videos.map((v) => ({ url: v.url, isVideo: true }));
   const allMedia = [...videos, ...photos];
@@ -87,15 +111,14 @@ const ProfileDetails: React.FC = () => {
   const profilePhone = perfil?.telefone ?? "";
 
   // Lógica “fora de expediente”
-  // Ajuste esses valores conforme o seu horário de expediente
   const agora = new Date();
   const horaAtual = agora.getHours(); // 0–23
   const INICIO_EXPEDIENTE = 8;  // 08:00
   const FIM_EXPEDIENTE = 20;    // 20:00
 
   // Estamos “fora do expediente” se:
-  //  - perfil existe e estaOffline (ou está carregado e .estaOnline === false)
-  //  - e a hora atual for antes de 08 ou igual/maior que 20
+  // - perfil existe e estaOffline (já carregou e perfil.estaOnline === false)
+  // - e a hora atual for antes de 08 ou igual/maior que 20
   const estaOffline = !loadingPerfil && perfil && !perfil.estaOnline;
   const estaForaDeExpediente =
     estaOffline && (horaAtual < INICIO_EXPEDIENTE || horaAtual >= FIM_EXPEDIENTE);
@@ -159,7 +182,7 @@ const ProfileDetails: React.FC = () => {
                 </span>
               )}
 
-              {/* Exibe “Fora de expediente” apenas se de fato estiver offline e fora do horário */}
+              {/* Exibe “Fora de expediente” apenas se estiver offline e fora do horário */}
               {estaForaDeExpediente && (
                 <span className="text-red-500 text-sm">Fora de expediente</span>
               )}
@@ -179,6 +202,7 @@ const ProfileDetails: React.FC = () => {
           </aside>
 
           <section className="md:w-2/3 border-l border-gray-300 pl-8 space-y-6">
+            {/* ====== Bandeirinhas de “verificado” e “sem denúncias” ====== */}
             <div className="flex flex-wrap gap-6">
               <div className="flex items-center space-x-2 text-gray-700">
                 <CheckCircle className="w-5 h-5 text-green-500" />
@@ -190,10 +214,11 @@ const ProfileDetails: React.FC = () => {
               </div>
             </div>
 
+            {/* ====== Barra de nota (preenchida randômica) ====== */}
             <div className="flex items-center space-x-4">
               <div className="flex-1 h-3 bg-gray-400 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-yellow-400"
+                  className="h-full bg-yellow-400 transition-all duration-500"
                   style={{ width: `${pctAnuncio}%` }}
                 />
               </div>
@@ -202,6 +227,7 @@ const ProfileDetails: React.FC = () => {
               </span>
             </div>
 
+            {/* ====== Estrelas baseadas na nota ====== */}
             <div className="flex items-center space-x-1">
               {Array.from({ length: 5 }).map((_, i) => (
                 <Star
@@ -231,24 +257,16 @@ const ProfileDetails: React.FC = () => {
         {/* ====== Seção de Descrição (Perfil + Anúncio) ====== */}
         <div className="rounded-lg bg-gray-200 text-gray-800 p-6">
           <h3 className="text-2xl font-semibold mb-4">Descrição</h3>
-
           {!loadingPerfil && perfil?.descricao && (
             <div className="mb-4">
-              <h4 className="text-lg font-medium text-gray-900 mb-1">
-                Sobre o Usuário:
-              </h4>
               <div className="text-gray-700 whitespace-pre-line">
                 {perfil.descricao}
               </div>
             </div>
           )}
-
-          <div className="text-gray-700 whitespace-pre-line">
-            {anuncio.descricao}
-          </div>
         </div>
 
-        {/* ====== Demais seções (galeria, modal, anúncios relacionados etc.) ====== */}
+        {/* ====== Galeria (Fotos + Vídeos) ====== */}
         <div className="rounded-lg bg-gray-200 text-gray-800 p-6">
           <div className="flex gap-6">
             <div className="w-1/4">
@@ -363,6 +381,7 @@ const ProfileDetails: React.FC = () => {
           </div>
         )}
 
+        {/* ====== Anúncios Relacionados ====== */}
         <div className="rounded-lg bg-gray-200 text-gray-800 p-6">
           <h3 className="text-2xl font-semibold mb-4">Anúncios Relacionados</h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
