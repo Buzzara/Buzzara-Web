@@ -23,6 +23,7 @@ const FeaturedSection: React.FC<FeaturedSectionProps> = ({
     return null;
   }
 
+  // Função auxiliar para gerar número de visualizações aleatórias
   function getRandomViews(min = 100, max = 5000): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
@@ -37,30 +38,34 @@ const FeaturedSection: React.FC<FeaturedSectionProps> = ({
               {anuncios.map((ad) => (
                 <CarouselItem
                   key={ad.servicoID}
-                  className="md:basis-1/2 lg:basis-1/3 xl:basis-1/4"
+                  className="md:basis-1/2 lg:basis-1/3 xl:basis-1/4 p-2"
                 >
+                  {/* 
+                    OBSERVAÇÃO IMPORTANTE:
+                    Removemos a div com altura fixa ("h-[480px]") para que o card
+                    cresça naturalmente de acordo com seu conteúdo. 
+                    Se você quiser restringir uma altura mínima ou máxima, pode trocar
+                    "h-[480px]" por algo como "min-h-[480px]" ou definir um "max-h-[XXXpx]"
+                    e depois permitir overflow-auto. 
+                  */}
                   <div className="p-1">
-                    <div className="h-[480px]">
-                      <div className="h-full">
-                        <AdCard
-                          id={String(ad.servicoID)}
-                          name={ad.nome}
-                          description={ad.descricao}
-                          image={ad.fotos?.[0]?.url || ""}
-                          rating={4.5}
-                          reviews={12}
-                          views={getRandomViews()}
-                          price={{ current: ad.preco }}
-                          tag={null}
-                          category={ad.categoria || "Outros"}
-                          location={
-                            ad.localizacao
-                              ? `${ad.localizacao.cidade}, ${ad.localizacao.estado}`
-                              : ""
-                          }
-                        />
-                      </div>
-                    </div>
+                    <AdCard
+                      id={String(ad.servicoID)}
+                      name={ad.nome}
+                      description={ad.descricao}
+                      image={ad.fotos?.[0]?.url || ""}
+                      rating={4.5}
+                      reviews={12}
+                      views={getRandomViews()}
+                      price={{ current: ad.preco }}
+                      tag={null}
+                      category={ad.categoria || "Outros"}
+                      location={
+                        ad.localizacao
+                          ? `${ad.localizacao.cidade}, ${ad.localizacao.estado}`
+                          : ""
+                      }
+                    />
                   </div>
                 </CarouselItem>
               ))}
