@@ -1,3 +1,8 @@
+import { Localizacao } from "./Servico";
+import { SobreUsuario } from "./Servico";
+import { Cache } from "./Servico";
+import { PerfilAcompanhante } from "./Servico";
+
 export interface LocalizacaoDTO {
   endereco: string | null;
   cidade: string | null;
@@ -36,7 +41,17 @@ export interface AnuncioPublico {
   fotoPerfilUrl: string;
   fotoCapaUrl: string;
   nomeAcompanhante: string;
-  localizacao: LocalizacaoDTO | null;
-  fotos: FotoAnuncioDTO[]; // caso seu JSON retorne um array de fotos
-  videos: VideoAnuncioDTO[]; // caso seu JSON retorne um array de vídeos
+  localizacao: Localizacao; // ❗️Use Localizacao aqui, não LocalizacaoDTO
+  fotos: FotoAnuncioDTO[];
+  videos: VideoAnuncioDTO[];
+
+  // Campos adicionais para conversão
+  genero?: string;
+  saidas?: string;
+  servicoPrestado?: string;
+  servicoEspecial?: string;
+  perfilAcompanhanteID?: number;
+  perfilAcompanhante?: PerfilAcompanhante;
+  sobreUsuario?: SobreUsuario;
+  caches?: Cache[];
 }

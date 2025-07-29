@@ -111,11 +111,6 @@ const AdCard: React.FC<AdCardProps> = ({
                 <span>Publicado: {postedDate}</span>
               </div>
             )}
-            {price && (
-              <span className="text-lg font-bold text-buzzara-secondary">
-                R${price.current}
-              </span>
-            )}
           </div>
         </div>
       </div>

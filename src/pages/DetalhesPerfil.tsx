@@ -406,10 +406,7 @@ const ProfileDetails: React.FC = () => {
                     <p className="text-sm text-gray-500 mb-2">
                       {a.nome ?? a.categoria}
                     </p>
-                    <div className="flex items-center space-x-1 text-gray-700">
-                      <DollarSign className="w-5 h-5" />
-                      <span>R${a.preco.toFixed(2)}</span>
-                    </div>
+  
                   </div>
                 </Link>
               ))}
