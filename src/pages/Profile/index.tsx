@@ -157,10 +157,6 @@ export default function ProfilePage() {
                 <span>{formatDateTime(anuncio.dataCriacao)}</span>
               </div>
               <div className="flex items-center">
-                <User className="mr-1" />
-                <span>ID {anuncio.servicoID}</span>
-              </div>
-              <div className="flex items-center">
                 <Eye className="mr-1" />
                 <span>{views.toLocaleString()}</span>
               </div>
@@ -190,7 +186,7 @@ export default function ProfilePage() {
                   <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
                     {anuncio.caches.map((c, idx) => (
                       <React.Fragment key={idx}>
-                        <span>{c.formaPagamento}</span>
+                        <span>{c.descricao}</span>
                         <span>R$ {c.valor.toFixed(2).replace(".", ",")}</span>
                       </React.Fragment>
                     ))}
@@ -201,17 +197,25 @@ export default function ProfilePage() {
                   </p>
                 )}
 
-                <div className="flex items-center space-x-6 mt-4 text-sm">
-                  <span className="flex items-center">
-                    <CheckCircle className="text-green-500 h-4 w-4 mr-1" /> Pix
-                  </span>
-                  <span className="flex items-center">
-                    <XCircle className="text-red-500 h-4 w-4 mr-1" /> Cartão
-                  </span>
-                  <span className="flex items-center">
-                    <CheckCircle className="text-green-500 h-4 w-4 mr-1" />{" "}
-                    Dinheiro
-                  </span>
+                <div className="flex items-center flex-wrap gap-4 mt-4 text-sm">
+                  {[
+                    // Passo 1: extrair todas as formas dos caches
+                    ...new Set(
+                      anuncio.caches
+                        ?.flatMap(
+                          (c) =>
+                            c.formaPagamento
+                              ?.split(",") // separa por vírgula
+                              .map((fp) => fp.trim()) // remove espaços extras
+                        )
+                        .filter(Boolean) // remove vazios
+                    ),
+                  ].map((forma, idx) => (
+                    <span key={idx} className="flex items-center">
+                      <CheckCircle className="text-green-500 h-4 w-4 mr-1" />
+                      {forma}
+                    </span>
+                  ))}
                 </div>
               </div>
               <div className="flex-1 mt-6 md:mt-0 md:pl-6 border-t md:border-t-0 md:border-l border-gray-300 pt-6 md:pt-0">

@@ -1,5 +1,6 @@
 // src/pages/HomePage.tsx
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import Header from "@/components/layout/Header";
 import Navigation from "@/components/layout/Navigation";
 import FeaturedSection from "@/components/sections/FeaturedSection";
@@ -10,21 +11,32 @@ import AnnouncementSection from "@/components/sections/AnnouncementSection";
 import { useAds } from "@/hooks/useAds";
 import type { AnuncioPublico } from "@/types/AnuncioPublico";
 
-const INITIAL_VISIBLE = 8; // quantos anúncios mostrar de cada “página”
+const INITIAL_VISIBLE = 8;
 
 const HomePage = () => {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [filtro, setFiltro] = useState<string>("");
   const [visibleCount, setVisibleCount] = useState<number>(INITIAL_VISIBLE);
 
-  const { ads, loading } = useAds(filtro);
+  const location = useLocation();
+  const { ads, loading, refetch } = useAds(filtro);
 
-  // sempre que mudar categoria ou pesquisa, resetamos a contagem
+  // Sempre que mudar categoria ou filtro, resetar contagem
   useEffect(() => {
     setVisibleCount(INITIAL_VISIBLE);
   }, [activeCategory, filtro]);
 
-  // filtra pelos termos de busca ou pela categoria ativa
+  // Refaz o fetch ao retornar para a página
+  useEffect(() => {
+    refetch();
+  }, [location.key]);
+
+  // Sempre que os anúncios mudarem, resetar contagem para garantir exibição dos novos
+  useEffect(() => {
+    setVisibleCount(INITIAL_VISIBLE);
+  }, [ads]);
+
+  // Filtra pelos termos de busca ou pela categoria ativa
   const filteredAds: AnuncioPublico[] =
     filtro.trim() !== ""
       ? ads
@@ -32,11 +44,10 @@ const HomePage = () => {
       ? ads.filter((ad) => ad.categoria === activeCategory)
       : ads;
 
-  // aplica paginação em todas as vistas
+  // Aplica paginação
   const adsToShow = filteredAds.slice(0, visibleCount);
 
   const handleSearch = (term: string) => {
-    // dispara a busca limpa
     setFiltro("");
     setTimeout(() => setFiltro(term), 0);
   };
@@ -75,7 +86,6 @@ const HomePage = () => {
               onCategoryChange={setActiveCategory}
             />
 
-            {/* botão “Ver Mais” para qualquer categoria ou busca */}
             {visibleCount < filteredAds.length && (
               <div className="flex justify-center my-6">
                 <button

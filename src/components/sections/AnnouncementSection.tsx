@@ -1,15 +1,15 @@
 // src/components/sections/AnnouncementSection.tsx
-import React from 'react';
-import AnnouncementCard from '@/components/cards/AnnouncementCard';
-import type { AnuncioPublico } from '@/types/AnuncioPublico';
-import type { IAnnouncement } from '@/types';
+import React from "react";
+import AnnouncementCard from "@/components/cards/AnnouncementCard";
+import type { AnuncioPublico } from "@/types/AnuncioPublico";
+import type { IAnnouncement } from "@/types";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from '@/components/ui/carousel';
+} from "@/components/ui/carousel";
 
 // 👉 Função auxiliar para gerar views aleatórias
 function getRandomViews(min = 100, max = 5000): number {
@@ -31,22 +31,20 @@ const AnnouncementSection: React.FC<AnnouncementSectionProps> = ({
 
   const mapped: IAnnouncement[] = anuncios.map((ad) => ({
     id: String(ad.servicoID),
-
-    // ⬇️ Troquei de ad.nomeAcompanhante para ad.nome (título do anúncio)
-    //    Se o seu AnuncioPublico tiver outro campo para título, use-o aqui.
     title: ad.nome,
-
     description: ad.descricao,
-    image: ad.fotos[0]?.url ?? '',
+    image: ad.fotos[0]?.url ?? "",
     price: ad.preco,
     location: ad.localizacao
-      ? [ad.localizacao.cidade, ad.localizacao.estado].filter(Boolean).join(', ')
-      : '',
+      ? [ad.localizacao.cidade, ad.localizacao.estado]
+          .filter(Boolean)
+          .join(", ")
+      : "",
     category: ad.categoria,
-    postedDate: ad.dataCriacao.split('T')[0],
+    postedDate: ad.dataCriacao, // ✅ agora com data + hora
     rating: 0,
     reviews: 0,
-    views: getRandomViews(), // aqui continua dinâmico
+    views: getRandomViews(),
     tag: undefined,
   }));
 
@@ -54,9 +52,12 @@ const AnnouncementSection: React.FC<AnnouncementSectionProps> = ({
     ? mapped.filter((ann) => ann.category === activeCategory)
     : mapped;
 
-  const sorted = filtered.slice().sort((a, b) =>
-    new Date(b.postedDate).getTime() - new Date(a.postedDate).getTime()
-  );
+  const sorted = filtered
+    .slice()
+    .sort(
+      (a, b) =>
+        new Date(b.postedDate).getTime() - new Date(a.postedDate).getTime()
+    );
 
   if (sorted.length === 0) return null;
 
@@ -65,7 +66,7 @@ const AnnouncementSection: React.FC<AnnouncementSectionProps> = ({
       <div className="container mx-auto">
         <h2 className="featured-section-title text-white">Anúncios Recentes</h2>
         <div className="relative mt-8">
-          <Carousel opts={{ align: 'start', loop: true }} className="w-full">
+          <Carousel opts={{ align: "start", loop: true }} className="w-full">
             <CarouselContent>
               {sorted.map((announcement) => (
                 <CarouselItem
