@@ -13,7 +13,6 @@ import {
 import useEmblaCarousel from "embla-carousel-react";
 import { useAnuncioPorID } from "@/hooks/useAnuncioPorServicoID";
 import { usePerfil } from "@/hooks/useBuscaPerfilPorID";
-import type { AnuncioPorServicoResponse } from "@/types/AnuncioPorServicoID";
 
 function getRandomViews(min = 100, max = 5000): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;

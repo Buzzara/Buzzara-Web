@@ -31,6 +31,22 @@ function getRandomNota(): number {
   return parseFloat((Math.random() * 5).toFixed(1));
 }
 
+function formatarTempoOffline(ultimoAcesso: string): string {
+  const ultimo = new Date(ultimoAcesso);
+  const agora = new Date();
+  const diffMs = agora.getTime() - ultimo.getTime();
+
+  const minutos = Math.floor(diffMs / 60000); // 1 minuto = 60.000 ms
+  const horas = Math.floor(minutos / 60);
+
+  if (minutos < 1) return "menos de 1 minuto";
+  if (minutos < 60) return `${minutos} minuto${minutos > 1 ? "s" : ""}`;
+  if (horas < 24) return `${horas} hora${horas > 1 ? "s" : ""} atrás`;
+
+  // Se for mais de 24h
+  return `${Math.floor(horas / 24)} dia${horas >= 48 ? "s" : ""} atrás`;
+}
+
 const ProfileDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { ads, loading } = useAds();
@@ -49,7 +65,7 @@ const ProfileDetails: React.FC = () => {
     setViews(getRandomViews());
   }, []);
 
-  // 2) Assim que o 'anuncio' for carregado (mudança em ads ou em id), 
+  // 2) Assim que o 'anuncio' for carregado (mudança em ads ou em id),
   //    gere um valor randômico para a nota daquele perfil específico.
   useEffect(() => {
     // Encontrar o anúncio correspondente ao ID
@@ -113,15 +129,16 @@ const ProfileDetails: React.FC = () => {
   // Lógica “fora de expediente”
   const agora = new Date();
   const horaAtual = agora.getHours(); // 0–23
-  const INICIO_EXPEDIENTE = 8;  // 08:00
-  const FIM_EXPEDIENTE = 20;    // 20:00
+  const INICIO_EXPEDIENTE = 8; // 08:00
+  const FIM_EXPEDIENTE = 20; // 20:00
 
   // Estamos “fora do expediente” se:
   // - perfil existe e estaOffline (já carregou e perfil.estaOnline === false)
   // - e a hora atual for antes de 08 ou igual/maior que 20
   const estaOffline = !loadingPerfil && perfil && !perfil.estaOnline;
   const estaForaDeExpediente =
-    estaOffline && (horaAtual < INICIO_EXPEDIENTE || horaAtual >= FIM_EXPEDIENTE);
+    estaOffline &&
+    (horaAtual < INICIO_EXPEDIENTE || horaAtual >= FIM_EXPEDIENTE);
 
   // Funções auxiliares
   const openModal = (url: string, video: boolean) => {
@@ -135,6 +152,10 @@ const ProfileDetails: React.FC = () => {
   const toggleShowPhone = () => {
     setShowPhone((prev) => !prev);
   };
+
+  const numeroWhatsApp = profilePhone.replace(/\D/g, "");
+  const mensagem = encodeURIComponent("Olá te encontrei no Buzzara!");
+  const linkWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${mensagem}`;
 
   return (
     <div className="min-h-screen flex flex-col bg-buzzara-background text-white">
@@ -172,7 +193,12 @@ const ProfileDetails: React.FC = () => {
                 ) : (
                   <span className="flex items-center space-x-2 text-gray-600 text-sm">
                     <span className="w-2 h-2 bg-gray-500 rounded-full inline-block" />
-                    <span>Offline há {views} minutos</span>
+                    <span>
+                      Offline há{" "}
+                      {perfil.ultimoAcesso
+                        ? formatarTempoOffline(perfil.ultimoAcesso)
+                        : "tempo desconhecido"}
+                    </span>
                   </span>
                 )
               ) : (
@@ -182,7 +208,6 @@ const ProfileDetails: React.FC = () => {
                 </span>
               )}
 
-              {/* Exibe “Fora de expediente” apenas se estiver offline e fora do horário */}
               {estaForaDeExpediente && (
                 <span className="text-red-500 text-sm">Fora de expediente</span>
               )}
@@ -241,15 +266,18 @@ const ProfileDetails: React.FC = () => {
               ))}
             </div>
 
-            {/* Botão “Ver Telefone” exibe telefone do perfil */}
-            <div className="flex space-x-4">
-              <button
-                onClick={toggleShowPhone}
-                className="flex items-center space-x-2 px-4 py-2 bg-black/75 hover:bg-black rounded-full text-white"
-              >
-                <Phone className="w-4 h-4" />
-                <span>{showPhone ? profilePhone : "Ver Telefone"}</span>
-              </button>
+            <div className="mt-4 space-y-2 text-gray-600">
+              {profilePhone && (
+                <a
+                  href={linkWhatsApp}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center mt-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition"
+                >
+                  <Phone className="w-4 h-4 mr-2" />
+                  Conversar no WhatsApp
+                </a>
+              )}
             </div>
           </section>
         </div>
@@ -406,7 +434,6 @@ const ProfileDetails: React.FC = () => {
                     <p className="text-sm text-gray-500 mb-2">
                       {a.nome ?? a.categoria}
                     </p>
-  
                   </div>
                 </Link>
               ))}
