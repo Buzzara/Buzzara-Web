@@ -22,7 +22,6 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({ announcement }) => 
   return (
     <Link to={`/profile/${announcement.id}`} className="block hover:no-underline h-full">
       <Card className="flex flex-col h-full bg-buzzara-card border-none text-white hover:shadow-lg transition-shadow">
-        {/* Imagem com tag (se houver) */}
         <div className="relative">
           {announcement.tag && (
             <div className={`absolute top-2 right-2 py-1 px-3 text-xs font-semibold rounded-full text-white z-10 ${getTagColor(announcement.tag.type)}`}>
@@ -36,22 +35,20 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({ announcement }) => 
           />
         </div>
 
-        {/* Cabeçalho */}
         <CardHeader className="pb-2">
           <CardTitle className="text-lg font-semibold text-white">{announcement.title}</CardTitle>
         </CardHeader>
 
-        {/* Conteúdo principal (expansível) */}
         <CardContent className="pb-2 flex-1 flex flex-col justify-between">
           <div>
             <p className="text-sm text-gray-300 line-clamp-2 mb-2">{announcement.description}</p>
 
             <div className="flex items-center justify-between mt-2 mb-1">
-              <div className="flex items-center">
+              {/* <div className="flex items-center">
                 <Star className="h-4 w-4 text-buzzara-secondary fill-buzzara-secondary" />
                 <span className="text-sm text-white ml-1">{announcement.rating}</span>
                 <span className="text-xs text-gray-400 ml-1">({announcement.reviews})</span>
-              </div>
+              </div> */}
               <div className="flex items-center text-gray-300">
                 <Eye className="h-4 w-4 mr-1" />
                 <span className="text-xs">{announcement.views}</span>
@@ -62,19 +59,18 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({ announcement }) => 
               <span>{announcement.location}</span>
             </div>
 
-            <Badge className="bg-gray-700 text-xs font-normal">
+            {/* <Badge className="bg-gray-700 text-xs font-normal">
               {announcement.category}
-            </Badge>
+            </Badge> */}
           </div>
         </CardContent>
 
-        {/* Rodapé com data e preço */}
         <CardFooter className="pt-0 flex justify-between items-center">
           <div className="flex items-center text-xs text-gray-400">
             <Clock className="h-3 w-3 mr-1" />
             <span>Publicado: {announcement.postedDate}</span>
           </div>
-          <span className="text-lg font-bold text-buzzara-secondary">R${announcement.price}</span>
+          <span className="text-lg font-bold text-buzzara-secondary">{announcement.price}</span>
         </CardFooter>
       </Card>
     </Link>

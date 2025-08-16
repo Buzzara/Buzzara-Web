@@ -31,7 +31,7 @@ const AdGrid: React.FC<AdGridProps> = ({
             className={`px-4 py-1 rounded-full text-sm font-medium transition-colors ${
               !activeCategory
                 ? "bg-buzzara-secondary text-white"
-                : "bg-buzzara-neutral-light text-gray-300 hover:bg-gray-600"
+                : "bg-buzzara-secondary text-gray-300 hover:bg-buzzara-secondary"
             }`}
           >
             Todos
@@ -44,7 +44,7 @@ const AdGrid: React.FC<AdGridProps> = ({
               className={`px-4 py-1 rounded-full text-sm font-medium transition-colors ${
                 activeCategory === cat
                   ? "bg-buzzara-secondary text-white"
-                  : "bg-buzzara-neutral-light text-gray-300 hover:bg-gray-600"
+                  : "bg-buzzara-neutral-light text-white hover:bg-buzzara-secondary"
               }`}
             >
               {cat}

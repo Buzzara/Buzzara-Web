@@ -23,7 +23,6 @@ const FeaturedSection: React.FC<FeaturedSectionProps> = ({
     return null;
   }
 
-  // Função auxiliar para gerar número de visualizações aleatórias
   function getRandomViews(min = 100, max = 5000): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
@@ -38,32 +37,29 @@ const FeaturedSection: React.FC<FeaturedSectionProps> = ({
               {anuncios.map((ad) => (
                 <CarouselItem
                   key={ad.servicoID}
-                  className="md:basis-1/2 lg:basis-1/3 xl:basis-1/4 p-2 h-full"
+                  className="md:basis-1/2 lg:basis-1/3 xl:basis-1/4 p-2"
                 >
-                  <div className="p-1 h-full">
-                    <div className="h-full min-h-[480px] flex flex-col">
-                      <AdCard
-                        id={String(ad.servicoID)}
-                        name={ad.nome}
-                        description={ad.descricao}
-                        image={ad.fotos?.[0]?.url || ""}
-                        rating={4.5}
-                        reviews={12}
-                        views={getRandomViews()}
-                        price={{ current: ad.preco }}
-                        tag={null}
-                        category={ad.categoria || "Outros"}
-                        location={
-                          ad.localizacao
-                            ? `${ad.localizacao.cidade}, ${ad.localizacao.estado}`
-                            : ""
-                        }
-                      />
-                    </div>
-                  </div>
+                  <AdCard
+                    id={String(ad.servicoID)}
+                    name={ad.nome}
+                    description={ad.descricao}
+                    image={ad.fotos?.[0]?.url || ""}
+                    rating={4.5}
+                    reviews={12}
+                    views={getRandomViews()}
+                    price={{ current: ad.preco }}
+                    tag={null}
+                    category={ad.categoria || "Outros"}
+                    location={
+                      ad.localizacao
+                        ? `${ad.localizacao.cidade}, ${ad.localizacao.estado}`
+                        : ""
+                    }
+                  />
                 </CarouselItem>
               ))}
             </CarouselContent>
+
             <CarouselPrevious className="absolute left-0 top-1/2 -translate-y-1/2 bg-black/50 text-white hover:bg-black/70 border-none" />
             <CarouselNext className="absolute right-0 top-1/2 -translate-y-1/2 bg-black/50 text-white hover:bg-black/70 border-none" />
           </Carousel>

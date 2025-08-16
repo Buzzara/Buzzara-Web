@@ -2,14 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import {
-  Clock,
-  Eye,
-  CheckCircle,
-  User,
-  XCircle,
-  DollarSign,
-} from "lucide-react";
+import { Clock, Eye, CheckCircle, DollarSign } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
 import { useAnuncioPorID } from "@/hooks/useAnuncioPorServicoID";
 import { usePerfil } from "@/hooks/useBuscaPerfilPorID";
@@ -52,9 +45,6 @@ export default function ProfilePage() {
   }, [emblaApi]);
 
   if (loading || !anuncio) return null;
-  console.log("🖼️ fotoPerfilUrl:", anuncio.fotoPerfilUrl);
-  console.log("👤 nomeAcompanhante:", anuncio.nomeAcompanhante);
-  console.log("📦 Dados do anúncio completo:", anuncio);
 
   const sobreTags = anuncio.sobreUsuario
     ? [
@@ -98,6 +88,7 @@ export default function ProfilePage() {
       <Header onSearch={() => {}} />
       <main className="flex-1 py-8 px-4 md:px-8">
         <div className="container mx-auto">
+          {/* breadcrumbs */}
           <div className="flex items-center text-sm text-white mb-6">
             <Link to="/" className="hover:text-white">
               Home
@@ -110,6 +101,7 @@ export default function ProfilePage() {
             <span>{anuncio.nome}</span>
           </div>
 
+          {/* header card */}
           <div className="bg-buzzara-neutral-light text-white rounded-lg p-6 mb-8 shadow">
             <div className="flex items-center space-x-4 mb-4">
               {anuncio.fotoPerfilUrl && (
@@ -160,21 +152,12 @@ export default function ProfilePage() {
                 <span>{views.toLocaleString()}</span>
               </div>
             </div>
-
-            <div className="text-white space-y-2">
-              <p>{anuncio.descricao}</p>
-              {anuncio.saidas && <p>{anuncio.saidas}</p>}
-              {anuncio.lugarEncontro && (
-                <p>
-                  <strong>Lugar de Encontro:</strong> {anuncio.lugarEncontro}
-                </p>
-              )}
-            </div>
           </div>
 
           {/* ======== FORMAS DE PAGAMENTO & HORÁRIO ======== */}
           <section className="bg-buzzara-neutral-light text-white rounded-lg p-6 mb-8">
             <div className="flex flex-col md:flex-row md:space-x-8">
+              {/* pagamentos */}
               <div className="flex-1">
                 <div className="flex items-center mb-4">
                   <DollarSign className="h-5 w-5 mr-2" />
@@ -198,16 +181,12 @@ export default function ProfilePage() {
 
                 <div className="flex items-center flex-wrap gap-4 mt-4 text-sm">
                   {[
-                    // Passo 1: extrair todas as formas dos caches
                     ...new Set(
                       anuncio.caches
-                        ?.flatMap(
-                          (c) =>
-                            c.formaPagamento
-                              ?.split(",") // separa por vírgula
-                              .map((fp) => fp.trim()) // remove espaços extras
+                        ?.flatMap((c) =>
+                          c.formaPagamento?.split(",").map((fp) => fp.trim())
                         )
-                        .filter(Boolean) // remove vazios
+                        .filter(Boolean)
                     ),
                   ].map((forma, idx) => (
                     <span key={idx} className="flex items-center">
@@ -217,6 +196,8 @@ export default function ProfilePage() {
                   ))}
                 </div>
               </div>
+
+              {/* horário */}
               <div className="flex-1 mt-6 md:mt-0 md:pl-6 border-t md:border-t-0 md:border-l border-gray-300 pt-6 md:pt-0">
                 <div className="flex items-center mb-4">
                   <Clock className="h-5 w-5 mr-2" />
@@ -244,7 +225,9 @@ export default function ProfilePage() {
             </div>
           </section>
 
+          {/* GRID PRINCIPAL */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* mídia */}
             <div className="relative">
               <div className="overflow-hidden rounded-lg" ref={emblaRef}>
                 <div className="flex">
@@ -309,7 +292,9 @@ export default function ProfilePage() {
               </div>
             </div>
 
+            {/* lateral direita */}
             <div>
+              {/* Sobre mim */}
               <section className="bg-buzzara-neutral-light text-white rounded-lg p-6 mb-6 shadow">
                 <h2 className="text-2xl font-semibold mb-4">Sobre mim</h2>
                 <div className="flex flex-wrap gap-2">
@@ -324,6 +309,7 @@ export default function ProfilePage() {
                 </div>
               </section>
 
+              {/* Meus serviços */}
               <section className="bg-buzzara-neutral-light text-white rounded-lg p-6 mb-6 shadow">
                 <h2 className="text-2xl font-semibold mb-4">Meus serviços</h2>
                 <div className="flex flex-wrap gap-2">
@@ -338,7 +324,8 @@ export default function ProfilePage() {
                 </div>
               </section>
 
-              <section className="bg-buzzara-neutral-light text-white rounded-lg p-6 shadow">
+              {/* Serviços especiais */}
+              <section className="bg-buzzara-neutral-light text-white rounded-lg p-6 shadow mb-6">
                 <h2 className="text-2xl font-semibold mb-4">
                   Serviços Especiais
                 </h2>
@@ -352,6 +339,34 @@ export default function ProfilePage() {
                     </span>
                   ))}
                 </div>
+              </section>
+
+              {/* Descrição (logo abaixo de Serviços Especiais) */}
+              <section className="bg-buzzara-neutral-light text-white rounded-lg p-6 shadow">
+                <h2 className="text-2xl font-semibold mb-4">Descrição</h2>
+
+                {/* Descrição principal */}
+                <p className="mb-4">{anuncio.descricao}</p>
+
+                {/* Saídas */}
+                {anuncio.saidas && (
+                  <p className="mb-2">
+                    <strong className=" text-yellow-500  px-1 rounded">
+                      Saídas:
+                    </strong>{" "}
+                    {anuncio.saidas}
+                  </p>
+                )}
+
+                {/* Lugar de Encontro */}
+                {anuncio.lugarEncontro && (
+                  <p>
+                    <strong className=" text-yellow-500 px-1 rounded">
+                      Lugar de Encontro:
+                    </strong>{" "}
+                    {anuncio.lugarEncontro}
+                  </p>
+                )}
               </section>
             </div>
           </div>

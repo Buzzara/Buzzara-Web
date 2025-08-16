@@ -19,12 +19,12 @@ const Navigation: React.FC<NavigationProps> = ({
   onCategoryChange,
 }) => {
   const categories: Category[] = [
-    {
-      id: 'anuncie',
-      name: 'Anuncie agora',
-      highlight: true,
-      url: 'https://painel.buzzara.com.br/registro',
-    },
+    // {
+    //   id: 'anuncie',
+    //   name: 'Anuncie agora',
+    //   highlight: true,
+    //   url: 'https://painel.buzzara.com.br/registro',
+    // },
     { id: 'mulheres', name: 'Mulheres', filter: 'Mulheres' },
     { id: 'homens',   name: 'Homens',   filter: 'Homens'   },
     { id: 'trans',    name: 'Trans',    filter: 'Trans'    },
@@ -58,7 +58,7 @@ const Navigation: React.FC<NavigationProps> = ({
                   ? 'bg-buzzara-accent text-white hover:bg-red-600'
                   : activeCategory === cat.filter
                   ? 'bg-gray-700 text-white'
-                  : 'text-gray-300 hover:text-white hover:bg-gray-700'
+                  : 'text-gray-300 hover:text-white hover:bg-buzzara-secondary'
               )}
             >
               {cat.name}
