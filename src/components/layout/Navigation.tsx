@@ -23,7 +23,7 @@ const Navigation: React.FC<NavigationProps> = ({
     //   id: 'anuncie',
     //   name: 'Anuncie agora',
     //   highlight: true,
-    //   url: 'https://painel.buzzara.com.br/registro',
+    //   url: 'http://localhost:5173/registro',
     // },
     { id: 'mulheres', name: 'Mulheres', filter: 'Mulheres' },
     { id: 'homens',   name: 'Homens',   filter: 'Homens'   },

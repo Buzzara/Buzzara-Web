@@ -1,27 +1,25 @@
-// src/components/layout/Header.tsx
-import React, { useState, useEffect } from 'react';
-import { Search, MapPin, User } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import LogoImg from '@/assets/images/logo.png';
-import { useGeolocation } from '@/hooks/useGeolocation';
+import React, { useEffect, useState } from "react";
+import { Search, MapPin, User } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import LogoImg from "@/assets/images/logo.png";
+import { useGeolocation } from "@/hooks/useGeolocation";
 
 interface HeaderProps {
-  onSearch: (term: string) => void;
+  onSearch?: (term: string) => void;
 }
 
 const Header: React.FC<HeaderProps> = ({ onSearch }) => {
-  const [search, setSearch] = useState('');
-  const [locationName, setLocationName] = useState('Carregando...');
+  const [search, setSearch] = useState("");
+  const [locationName, setLocationName] = useState("Carregando...");
   const { coords, loading: geoLoading } = useGeolocation();
 
   const handleSearch = () => {
     const term = search.trim();
-    console.log('[Header] 🔍 Termo de busca enviado:', term);
-    onSearch(term);
+    console.log("[Header] termo de busca enviado:", term);
+    onSearch?.(term);
   };
 
-  // Faz o reverse geocoding quando as coords estiverem disponíveis
   useEffect(() => {
     if (!coords) return;
 
@@ -36,11 +34,11 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
           data.address.town ||
           data.address.village ||
           data.address.state ||
-          'Localização desconhecida';
+          "Localizacao desconhecida";
         setLocationName(city);
       } catch (error) {
-        console.error('[Header] Erro ao buscar localização:', error);
-        setLocationName('Erro ao buscar');
+        console.error("[Header] erro ao buscar localizacao:", error);
+        setLocationName("Erro ao buscar");
       }
     };
 
@@ -65,7 +63,7 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === 'Enter') {
+                if (e.key === "Enter") {
                   handleSearch();
                 }
               }}
@@ -80,16 +78,14 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
           <div className="flex bg-buzzara-secondary rounded-md px-3 items-center cursor-pointer border border-gray-700">
             <MapPin className="h-4 w-4 text-buzzara-neutral mr-1" />
             <span className="text-sm text-buzzara-neutral">
-              {geoLoading ? 'Detectando...' : locationName}
+              {geoLoading ? "Detectando..." : locationName}
             </span>
           </div>
         </div>
 
         <div>
           <a
-            href="https://painel.buzzara.com.br/login"
-            target="_blank"
-            rel="noopener noreferrer"
+            href={import.meta.env.VITE_ADMIN_URL || "http://localhost:5173/login"}
           >
             <Button
               variant="outline"

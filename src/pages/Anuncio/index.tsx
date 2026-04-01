@@ -24,9 +24,6 @@ export default function Anuncio() {
           <div key={anuncio.servicoID} className="border p-4 rounded shadow">
             <h2 className="text-xl font-semibold">{anuncio.nome}</h2>
             <p className="text-gray-600">{anuncio.descricao}</p>
-            <p className="text-green-700 font-bold">
-              R$ {anuncio.preco.toFixed(2)}
-            </p>
             <p className="text-sm text-gray-500">
               {anuncio.localizacao?.cidade}, {anuncio.localizacao?.estado}
             </p>

@@ -5,7 +5,6 @@ import Footer from "@/components/layout/Footer";
 import { Clock, Eye, CheckCircle, DollarSign } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
 import { useAnuncioPorID } from "@/hooks/useAnuncioPorServicoID";
-import { usePerfil } from "@/hooks/useBuscaPerfilPorID";
 
 function getRandomViews(min = 100, max = 5000): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -26,8 +25,6 @@ export default function ProfilePage() {
   const servicoID = Number(id);
 
   const { anuncio, loading } = useAnuncioPorID(servicoID);
-  const perfilID = anuncio?.usuarioID ?? null;
-  const { perfil } = usePerfil(perfilID);
 
   const [views, setViews] = useState<number>(0);
   const [selectedIndex, setSelectedIndex] = useState(0);

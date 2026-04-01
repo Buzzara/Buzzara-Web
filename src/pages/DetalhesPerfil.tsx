@@ -12,7 +12,6 @@ import {
   Grid,
   Camera,
   Video,
-  DollarSign,
   AlertTriangle,
   X,
 } from "lucide-react";
@@ -21,12 +20,10 @@ import { usePerfilPublico } from "@/hooks/usePublicoPerfil";
 import type { AnuncioPublico } from "@/types/AnuncioPublico";
 import type { PerfilPublico } from "@/types/PerfilPublico";
 
-// Função auxiliar para gerar "Offline há X minutos"
 function getRandomViews(min = 100, max = 5000): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-// Função auxiliar para gerar nota aleatória entre 0.0 e 5.0 (com uma casa decimal)
 function getRandomNota(): number {
   return parseFloat((Math.random() * 5).toFixed(1));
 }
@@ -231,11 +228,11 @@ const ProfileDetails: React.FC = () => {
             <div className="flex flex-wrap gap-6">
               <div className="flex items-center space-x-2 text-gray-700">
                 <CheckCircle className="w-5 h-5 text-green-500" />
-                <span>Acompanhante Verificado</span>
+                <span>Perfil público ativo</span>
               </div>
               <div className="flex items-center space-x-2 text-gray-700">
                 <ShieldOff className="w-5 h-5" />
-                <span>Não possui denúncias</span>
+                <span>Status exibido conforme retorno da API</span>
               </div>
             </div>
 
@@ -431,9 +428,7 @@ const ProfileDetails: React.FC = () => {
                     <h4 className="font-semibold text-lg mb-1">
                       {a.nomeAcompanhante}
                     </h4>
-                    <p className="text-sm text-gray-500 mb-2">
-                      {a.nome ?? a.categoria}
-                    </p>
+                    <p className="text-sm text-gray-500 mb-2">{a.nome}</p>
                   </div>
                 </Link>
               ))}

@@ -41,7 +41,7 @@ const HomePage = () => {
     filtro.trim() !== ""
       ? ads
       : activeCategory
-      ? ads.filter((ad) => ad.categoria === activeCategory)
+      ? ads.filter((ad) => ad.genero === activeCategory)
       : ads;
 
   // Aplica paginação

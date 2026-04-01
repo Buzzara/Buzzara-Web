@@ -1,16 +1,4 @@
-import { Localizacao } from "./Servico";
-import { SobreUsuario } from "./Servico";
-import { Cache } from "./Servico";
-import { PerfilAcompanhante } from "./Servico";
-
-export interface LocalizacaoDTO {
-  endereco: string | null;
-  cidade: string | null;
-  estado: string | null;
-  bairro: string | null;
-  latitude: number | null;
-  longitude: number | null;
-}
+import { Cache, Localizacao, SobreUsuario } from "./Servico";
 
 export interface FotoAnuncioDTO {
   fotoAnuncioID: number;
@@ -24,34 +12,35 @@ export interface VideoAnuncioDTO {
   dataUpload: string;
 }
 
+export interface HorarioAtendimentoDTO {
+  diaSemana: string;
+  atende: boolean;
+  horarioInicio?: string | null;
+  horarioFim?: string | null;
+  vinteQuatroHoras: boolean;
+}
+
 export interface AnuncioPublico {
   servicoID: number;
   usuarioID: number;
   nome: string;
+  genero: string;
   descricao: string;
-  preco: number;
-  categoria: string;
   lugarEncontro: string;
-  disponibilidade: string;
-  idade: number;
-  peso: number;
-  estaOnline: boolean;
-  altura: number;
+  servicoPrestado: string;
+  servicoEspecial: string;
+  disponibilidade?: string | null;
+  idade?: number | null;
+  peso?: number | null;
+  altura?: number | null;
   dataCriacao: string;
-  fotoPerfilUrl: string;
-  fotoCapaUrl: string;
+  fotoPerfilUrl: string | null;
   nomeAcompanhante: string;
-  localizacao: Localizacao; // ❗️Use Localizacao aqui, não LocalizacaoDTO
+  localizacao: Localizacao | null;
   fotos: FotoAnuncioDTO[];
   videos: VideoAnuncioDTO[];
-
-  // Campos adicionais para conversão
-  genero?: string;
   saidas?: string;
-  servicoPrestado?: string;
-  servicoEspecial?: string;
-  perfilAcompanhanteID?: number;
-  perfilAcompanhante?: PerfilAcompanhante;
   sobreUsuario?: SobreUsuario;
   caches?: Cache[];
+  horariosAtendimento?: HorarioAtendimentoDTO[];
 }
